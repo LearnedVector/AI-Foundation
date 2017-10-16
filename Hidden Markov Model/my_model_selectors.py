@@ -76,10 +76,10 @@ class SelectorBIC(ModelSelector):
         """
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        best_score, best_model = float("-inf"), None
-        
+        best_score, best_model = float("inf"), None
+
         # iterate through the num_states to find the best model
-        for n_components in range(self.min_n_components, self.max_n_components - 1):
+        for n_components in range(self.min_n_components, self.max_n_components + 1):
             try:
                 hmm_model = self.base_model(n_components)
                 logL = hmm_model.score(self.X, self.lengths)
@@ -87,7 +87,7 @@ class SelectorBIC(ModelSelector):
                 n_params = n_components**2 + 2*n_components*n_features - 1
                 logN = np.log(n_features)
                 bic = -2*logL + n_params*logN
-                if bic > best_score:
+                if bic < best_score:
                     best_score, best_model = bic, hmm_model
             except:
                 pass
@@ -124,7 +124,7 @@ class SelectorDIC(ModelSelector):
         words = self.generate_words()
         
         # iterates through num_states to create models
-        for n_components in range(self.min_n_components, self.max_n_components):
+        for n_components in range(self.min_n_components, self.max_n_components + 1):
             try:
                 hmm_model = self.base_model(n_components)
                 logL = hmm_model.score(self.X, self.lengths)
